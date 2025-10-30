@@ -15,7 +15,7 @@
     "gifenc": "1.0.3",
     "immer": "latest",
     "lodash.shuffle": "latest",
-    "p-limit": "latest",
+    "p-limit": "5.0.0",
     "react": "latest",
     "react-dom": "latest",
     "zustand": "latest"
