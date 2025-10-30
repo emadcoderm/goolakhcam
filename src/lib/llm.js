@@ -17,23 +17,23 @@ export default limitFunction(
         const timeoutPromise = new Promise((_, reject) =>
           setTimeout(() => reject(new Error('timeout')), timeoutMs)
         )
-        
-        const parts = [{text: prompt}];
+
+        const parts = [{text: prompt}]
         if (inputFile) {
           parts.push({
             inlineData: {
               data: inputFile.split(',')[1],
               mimeType: 'image/jpeg'
             }
-          });
+          })
         }
 
         const modelPromise = ai.models.generateContent({
           model,
           config: {responseModalities: [Modality.IMAGE]},
-          contents: { parts },
+          contents: [{parts}],
           safetySettings
-        });
+        })
 
         const response = await Promise.race([modelPromise, timeoutPromise])
 
