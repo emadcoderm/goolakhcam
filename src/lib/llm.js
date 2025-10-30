@@ -8,8 +8,15 @@ import pLimit from 'p-limit'
 const timeoutMs = 123_333
 const maxRetries = 5
 const baseDelay = 1_233
-const ai = new GoogleGenAI({apiKey: process.env.API_KEY})
+let ai;
 const limit = pLimit(2);
+
+const getAi = () => {
+  if (!ai) {
+    ai = new GoogleGenAI({apiKey: process.env.API_KEY});
+  }
+  return ai;
+}
 
 export default (args) => limit(async () => {
     const {model, prompt, inputFile, signal} = args;
@@ -30,7 +37,7 @@ export default (args) => limit(async () => {
         }
         parts.push({text: prompt})
 
-        const modelPromise = ai.models.generateContent({
+        const modelPromise = getAi().models.generateContent({
           model,
           config: {responseModalities: [Modality.IMAGE]},
           contents: {parts}

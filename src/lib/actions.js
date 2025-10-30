@@ -118,7 +118,7 @@ export const makeGif = async () => {
   })
 
   try {
-    const gif = new GIFEncoder()
+    const gif = GIFEncoder()
     const readyPhotos = photos.filter(photo => !photo.isBusy)
 
     for (const photo of readyPhotos) {
