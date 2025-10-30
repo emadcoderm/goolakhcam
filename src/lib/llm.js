@@ -8,7 +8,7 @@ import {limitFunction} from 'p-limit'
 const timeoutMs = 123_333
 const maxRetries = 5
 const baseDelay = 1_233
-const ai = new GoogleGenAI({apiKey: process.env.GEMINI_API_KEY})
+const ai = new GoogleGenAI({apiKey: process.env.API_KEY})
 
 export default limitFunction(
   async ({model, prompt, inputFile, signal}) => {
@@ -21,7 +21,7 @@ export default limitFunction(
         const modelPromise = ai.models.generateContent(
           {
             model,
-            config: {responseModalities: [Modality.TEXT, Modality.IMAGE]},
+            config: {responseModalities: [Modality.IMAGE]},
             contents: [
               {
                 role: 'user',
