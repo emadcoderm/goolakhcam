@@ -49,7 +49,14 @@ export default (args) => limit(async () => {
           throw new Error('No candidates in response')
         }
 
-        const inlineDataPart = response.candidates[0].content.parts.find(
+        const candidate = response.candidates[0];
+
+        if (!candidate.content || !candidate.content.parts) {
+            console.error('API response blocked or malformed:', response);
+            throw new Error('No content found in API response, possibly due to safety filters.');
+        }
+
+        const inlineDataPart = candidate.content.parts.find(
           p => p.inlineData
         )
         if (!inlineDataPart) {
