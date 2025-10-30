@@ -18,7 +18,7 @@ export default limitFunction(
           setTimeout(() => reject(new Error('timeout')), timeoutMs)
         )
 
-        const parts = [{text: prompt}]
+        const parts = []
         if (inputFile) {
           parts.push({
             inlineData: {
@@ -27,11 +27,12 @@ export default limitFunction(
             }
           })
         }
+        parts.push({text: prompt})
 
         const modelPromise = ai.models.generateContent({
           model,
           config: {responseModalities: [Modality.IMAGE]},
-          contents: [{parts}],
+          contents: {parts},
           safetySettings
         })
 
