@@ -33,6 +33,7 @@ export default function App() {
   const [hoveredMode, setHoveredMode] = useState(null)
   const [tooltipPosition, setTooltipPosition] = useState({top: 0, left: 0})
   const [showCustomPrompt, setShowCustomPrompt] = useState(false)
+  const [isMobileGalleryOpen, setIsMobileGalleryOpen] = useState(false)
   const videoRef = useRef(null)
   const fileInputRef = useRef(null)
 
@@ -141,6 +142,63 @@ export default function App() {
     })
   }, [])
 
+  const PhotoList = ({isMobile}) => (
+    <ul>
+      {photos.length
+        ? photos.map(({id, mode, isBusy}) => (
+            <li className={c({isBusy})} key={id}>
+              <button
+                className="circleBtn deleteBtn"
+                onClick={() => {
+                  deletePhoto(id)
+                  if (focusedId === id) {
+                    setFocusedId(null)
+                  }
+                }}
+              >
+                <span className="icon">delete</span>
+              </button>
+              <button
+                className="photo"
+                onClick={() => {
+                  if (!isBusy) {
+                    setFocusedId(id)
+                    if (isMobile) setIsMobileGalleryOpen(false)
+                    hideGif()
+                  }
+                }}
+              >
+                <img
+                  src={isBusy ? imageData.inputs[id] : imageData.outputs[id]}
+                  draggable={false}
+                />
+                <p className="emoji">
+                  {mode === 'custom' ? '✏️' : modes[mode].emoji}
+                </p>
+              </button>
+            </li>
+          ))
+        : videoActive &&
+          !isMobile && (
+            <li className="empty" key="empty">
+              <p>
+                <span className="icon">photo_camera</span>
+              </p>
+              برای شروع یک عکس بگیرید.
+            </li>
+          )}
+      {photos.filter(p => !p.isBusy).length > 0 && !isMobile && (
+        <button
+          className="button makeGif"
+          onClick={makeGif}
+          disabled={gifInProgress}
+        >
+          {gifInProgress ? 'یک لحظه…' : 'ساختن GIF!'}
+        </button>
+      )}
+    </ul>
+  )
+
   return (
     <main>
       <input
@@ -152,61 +210,32 @@ export default function App() {
       />
       <div className="results">
         <h2>گالری</h2>
-        <ul>
-          {photos.length
-            ? photos.map(({id, mode, isBusy}) => (
-                <li className={c({isBusy})} key={id}>
-                  <button
-                    className="circleBtn deleteBtn"
-                    onClick={() => {
-                      deletePhoto(id)
-                      if (focusedId === id) {
-                        setFocusedId(null)
-                      }
-                    }}
-                  >
-                    <span className="icon">delete</span>
-                  </button>
-                  <button
-                    className="photo"
-                    onClick={() => {
-                      if (!isBusy) {
-                        setFocusedId(id)
-                        hideGif()
-                      }
-                    }}
-                  >
-                    <img
-                      src={
-                        isBusy ? imageData.inputs[id] : imageData.outputs[id]
-                      }
-                      draggable={false}
-                    />
-                    <p className="emoji">
-                      {mode === 'custom' ? '✏️' : modes[mode].emoji}
-                    </p>
-                  </button>
-                </li>
-              ))
-            : videoActive && (
-                <li className="empty" key="empty">
-                  <p>
-                    <span className="icon">photo_camera</span>
-                  </p>
-                  برای شروع یک عکس بگیرید.
-                </li>
-              )}
+        <PhotoList />
+      </div>
+
+      {isMobileGalleryOpen && (
+        <div className="mobileGallery">
+          <div className="mobileGalleryHeader">
+            <h2>گالری</h2>
+            <button onClick={() => setIsMobileGalleryOpen(false)}>
+              <span className="icon">close</span>
+            </button>
+          </div>
+          <PhotoList isMobile={true} />
           {photos.filter(p => !p.isBusy).length > 0 && (
             <button
               className="button makeGif"
-              onClick={makeGif}
+              onClick={() => {
+                makeGif()
+                setIsMobileGalleryOpen(false)
+              }}
               disabled={gifInProgress}
             >
               {gifInProgress ? 'یک لحظه…' : 'ساختن GIF!'}
             </button>
           )}
-        </ul>
-      </div>
+        </div>
+      )}
 
       <div
         className="video"
@@ -297,7 +326,7 @@ export default function App() {
             <div className="mainControls">
               <button
                 className="galleryPreview"
-                onClick={() => photos.length > 0 && setFocusedId(photos[0].id)}
+                onClick={() => photos.length > 0 && setIsMobileGalleryOpen(true)}
               >
                 {photos.length > 0 && (
                   <img src={imageData.inputs[photos[0].id]} />
