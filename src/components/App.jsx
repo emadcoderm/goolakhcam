@@ -178,8 +178,7 @@ export default function App() {
               </button>
             </li>
           ))
-        : videoActive &&
-          !isMobile && (
+        : videoActive && (
             <li className="empty" key="empty">
               <p>
                 <span className="icon">photo_camera</span>

@@ -543,11 +543,20 @@ main {
 
 .mobileGallery ul {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+  grid-template-columns: repeat(3, 1fr);
   gap: 10px;
   overflow-y: auto;
   flex-grow: 1;
   padding: 5px;
+}
+.mobileGallery ul li.empty {
+  grid-column-start: 1;
+  grid-column-end: -1;
+  border-style: solid;
+  border-color: #444;
+}
+.mobileGallery li .deleteBtn {
+  scale: 1;
 }
 .mobileGallery ul li {
   width: 100%;
