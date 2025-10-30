@@ -3,15 +3,16 @@
  * SPDX-License-Identifier: Apache-2.0
 */
 import {GoogleGenAI, Modality} from '@google/genai'
-import {limitFunction} from 'p-limit'
+import pLimit from 'p-limit'
 
 const timeoutMs = 123_333
 const maxRetries = 5
 const baseDelay = 1_233
 const ai = new GoogleGenAI({apiKey: process.env.API_KEY})
+const limit = pLimit(2);
 
-export default limitFunction(
-  async ({model, prompt, inputFile, signal}) => {
+export default (args) => limit(async () => {
+    const {model, prompt, inputFile, signal} = args;
     for (let attempt = 0; attempt < maxRetries; attempt++) {
       try {
         const timeoutPromise = new Promise((_, reject) =>
@@ -65,6 +66,4 @@ export default limitFunction(
         )
       }
     }
-  },
-  {concurrency: 2}
-)
+})
