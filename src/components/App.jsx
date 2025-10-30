@@ -33,7 +33,17 @@ export default function App() {
   const [hoveredMode, setHoveredMode] = useState(null)
   const [tooltipPosition, setTooltipPosition] = useState({top: 0, left: 0})
   const [showCustomPrompt, setShowCustomPrompt] = useState(false)
+  const [filterQuery, setFilterQuery] = useState('')
+  const [filterBy, setFilterBy] = useState('name')
+  const [isFiltering, setIsFiltering] = useState(false)
   const videoRef = useRef(null)
+
+  const filteredModes = Object.entries(modes).filter(([, mode]) => {
+    if (!filterQuery) return true
+    const query = filterQuery.toLowerCase().trim()
+    const target = mode[filterBy]?.toLowerCase()
+    return target?.includes(query)
+  })
 
   const startVideo = async () => {
     setDidInitVideo(true)
@@ -81,7 +91,7 @@ export default function App() {
   const downloadImage = () => {
     const a = document.createElement('a')
     a.href = gifUrl || imageData.outputs[focusedId]
-    a.download = `gembooth.${gifUrl ? 'gif' : 'jpg'}`
+    a.download = `goolakh.${gifUrl ? 'gif' : 'jpg'}`
     a.click()
   }
 
@@ -105,121 +115,8 @@ export default function App() {
 
   return (
     <main>
-      <div
-        className="video"
-        onClick={() => {
-          hideGif()
-          setFocusedId(null)
-        }}
-      >
-        {showCustomPrompt && (
-          <div className="customPrompt">
-            <button
-              className="circleBtn"
-              onClick={() => {
-                setShowCustomPrompt(false)
-
-                if (customPrompt.trim().length === 0) {
-                  setMode(modeKeys[0])
-                }
-              }}
-            >
-              <span className="icon">close</span>
-            </button>
-            <textarea
-              type="text"
-              placeholder="Enter a custom prompt"
-              value={customPrompt}
-              onChange={e => setCustomPrompt(e.target.value)}
-              onKeyDown={e => {
-                if (e.key === 'Enter') {
-                  setShowCustomPrompt(false)
-                }
-              }}
-            />
-          </div>
-        )}
-        <video
-          ref={videoRef}
-          muted
-          autoPlay
-          playsInline
-          disablePictureInPicture="true"
-        />
-        {didJustSnap && <div className="flash" />}
-        {!videoActive && (
-          <button className="startButton" onClick={startVideo}>
-            <h1>📸 GemBooth</h1>
-            <p>{didInitVideo ? 'One sec…' : 'Tap anywhere to start webcam'}</p>
-          </button>
-        )}
-
-        {videoActive && (
-          <div className="videoControls">
-            <button onClick={takePhoto} className="shutter">
-              <span className="icon">camera</span>
-            </button>
-
-            <ul className="modeSelector">
-              <li
-                key="custom"
-                onMouseEnter={e =>
-                  handleModeHover({key: 'custom', prompt: customPrompt}, e)
-                }
-                onMouseLeave={() => handleModeHover(null)}
-              >
-                <button
-                  className={c({active: activeMode === 'custom'})}
-                  onClick={() => {
-                    setMode('custom')
-                    setShowCustomPrompt(true)
-                  }}
-                >
-                  <span>✏️</span> <p>Custom</p>
-                </button>
-              </li>
-              {Object.entries(modes).map(([key, {name, emoji, prompt}]) => (
-                <li
-                  key={key}
-                  onMouseEnter={e => handleModeHover({key, prompt}, e)}
-                  onMouseLeave={() => handleModeHover(null)}
-                >
-                  <button
-                    onClick={() => setMode(key)}
-                    className={c({active: key === activeMode})}
-                  >
-                    <span>{emoji}</span> <p>{name}</p>
-                  </button>
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
-
-        {(focusedId || gifUrl) && (
-          <div className="focusedPhoto" onClick={e => e.stopPropagation()}>
-            <button
-              className="circleBtn"
-              onClick={() => {
-                hideGif()
-                setFocusedId(null)
-              }}
-            >
-              <span className="icon">close</span>
-            </button>
-            <img
-              src={gifUrl || imageData.outputs[focusedId]}
-              alt="photo"
-              draggable={false}
-            />
-            <button className="button downloadButton" onClick={downloadImage}>
-              Download
-            </button>
-          </div>
-        )}
-      </div>
-
       <div className="results">
+        <h2>گالری</h2>
         <ul>
           {photos.length
             ? photos.map(({id, mode, isBusy}) => (
@@ -259,24 +156,187 @@ export default function App() {
             : videoActive && (
                 <li className="empty" key="empty">
                   <p>
-                    👉 <span className="icon">camera</span>
+                    <span className="icon">photo_camera</span>
                   </p>
-                  Snap a photo to get started.
+                  برای شروع یک عکس بگیرید.
                 </li>
               )}
+          {photos.filter(p => !p.isBusy).length > 0 && (
+            <button
+              className="button makeGif"
+              onClick={makeGif}
+              disabled={gifInProgress}
+            >
+              {gifInProgress ? 'یک لحظه…' : 'ساختن GIF!'}
+            </button>
+          )}
         </ul>
-        {photos.filter(p => !p.isBusy).length > 0 && (
-          <button
-            className="button makeGif"
-            onClick={makeGif}
-            disabled={gifInProgress}
-          >
-            {gifInProgress ? 'One sec…' : 'Make GIF!'}
+      </div>
+
+      <div
+        className="video"
+        onClick={() => {
+          if (focusedId || gifUrl) {
+            hideGif()
+            setFocusedId(null)
+          }
+        }}
+      >
+        {showCustomPrompt && (
+          <div className="customPrompt">
+            <button
+              className="circleBtn"
+              onClick={() => {
+                setShowCustomPrompt(false)
+
+                if (customPrompt.trim().length === 0) {
+                  setMode(modeKeys[0])
+                }
+              }}
+            >
+              <span className="icon">close</span>
+            </button>
+            <textarea
+              type="text"
+              placeholder="یک دستور سفارشی وارد کنید"
+              value={customPrompt}
+              onChange={e => setCustomPrompt(e.target.value)}
+              onKeyDown={e => {
+                if (e.key === 'Enter') {
+                  setShowCustomPrompt(false)
+                }
+              }}
+            />
+          </div>
+        )}
+        <video
+          ref={videoRef}
+          muted
+          autoPlay
+          playsInline
+          disablePictureInPicture="true"
+        />
+        {didJustSnap && <div className="flash" />}
+        {!videoActive && (
+          <button className="startButton" onClick={startVideo}>
+            <h1>📸 goolakh</h1>
+            <p>{didInitVideo ? 'یک لحظه…' : 'برای شروع وب‌کم، هرجا ضربه بزنید'}</p>
           </button>
+        )}
+
+        {videoActive && (
+          <div className="videoControls">
+            {isFiltering ? (
+              <div className="filterControls">
+                <span className="icon">filter_alt</span>
+                <input
+                  type="text"
+                  aria-label="Filter modes"
+                  placeholder="فیلتر..."
+                  value={filterQuery}
+                  onChange={e => setFilterQuery(e.target.value)}
+                  autoFocus
+                />
+                <div className="filterOptions">
+                  <button
+                    className={c({active: filterBy === 'name'})}
+                    onClick={() => setFilterBy('name')}
+                  >
+                    نام
+                  </button>
+                  <button
+                    className={c({active: filterBy === 'emoji'})}
+                    onClick={() => setFilterBy('emoji')}
+                  >
+                    ایموجی
+                  </button>
+                  <button
+                    className={c({active: filterBy === 'prompt'})}
+                    onClick={() => setFilterBy('prompt')}
+                  >
+                    دستور
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <ul className="modeSelector">
+                <li
+                  key="custom"
+                  onMouseEnter={e =>
+                    handleModeHover({key: 'custom', prompt: customPrompt}, e)
+                  }
+                  onMouseLeave={() => handleModeHover(null)}
+                >
+                  <button
+                    className={c({active: activeMode === 'custom'})}
+                    onClick={() => {
+                      setMode('custom')
+                      setShowCustomPrompt(true)
+                    }}
+                  >
+                    <p>سفارشی</p>
+                  </button>
+                </li>
+                {filteredModes.map(([key, {name, emoji, prompt}]) => (
+                  <li
+                    key={key}
+                    onMouseEnter={e => handleModeHover({key, prompt}, e)}
+                    onMouseLeave={() => handleModeHover(null)}
+                  >
+                    <button
+                      onClick={() => setMode(key)}
+                      className={c({active: key === activeMode})}
+                    >
+                      <p>{name}</p>
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            )}
+            <div className="mainControls">
+              <button
+                className="galleryPreview"
+                onClick={() => photos.length > 0 && setFocusedId(photos[0].id)}
+              >
+                {photos.length > 0 && (
+                  <img src={imageData.inputs[photos[0].id]} />
+                )}
+              </button>
+              <button onClick={takePhoto} className="shutter" />
+              <button
+                className="cameraSwitch"
+                onClick={() => setIsFiltering(!isFiltering)}
+              >
+                <span className="icon">{isFiltering ? 'close' : 'search'}</span>
+              </button>
+            </div>
+          </div>
+        )}
+
+        {(focusedId || gifUrl) && (
+          <div className="focusedPhoto" onClick={e => e.stopPropagation()}>
+            <button
+              className="circleBtn"
+              onClick={() => {
+                hideGif()
+                setFocusedId(null)
+              }}
+            >
+              <span className="icon">close</span>
+            </button>
+            <img
+              src={gifUrl || imageData.outputs[focusedId]}
+              alt="عکس"
+              draggable={false}
+            />
+            <button className="button downloadButton" onClick={downloadImage}>
+              دانلود
+            </button>
+          </div>
         )}
       </div>
 
-      {hoveredMode && (
+      {hoveredMode && !isFiltering && (
         <div
           className={c('tooltip', {isFirst: hoveredMode.key === 'custom'})}
           role="tooltip"
@@ -287,11 +347,11 @@ export default function App() {
           }}
         >
           {hoveredMode.key === 'custom' && !hoveredMode.prompt.length ? (
-            <p>Click to set a custom prompt</p>
+            <p>برای تنظیم دستور سفارشی کلیک کنید</p>
           ) : (
             <>
               <p>"{hoveredMode.prompt}"</p>
-              <h4>Prompt</h4>
+              <h4>دستور</h4>
             </>
           )}
         </div>

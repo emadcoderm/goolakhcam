@@ -4,82 +4,82 @@
 */
 export default {
   renaissance: {
-    name: 'Renaissance',
+    name: 'رنسانس',
     emoji: '🎨',
-    prompt: 'Make the person in the photo look like a Renaissance painting.'
+    prompt: 'شخص داخل عکس را شبیه به یک نقاشی رنسانس کن.'
   },
 
   cartoon: {
-    name: 'Cartoon',
+    name: 'کارتون',
     emoji: '😃',
     prompt:
-      'Transform this image into a cute simple cartoon. Use minimal lines and solid colors.'
+      'این تصویر را به یک کارتون ساده و بامزه تبدیل کن. از خطوط کم و رنگ‌های یکدست استفاده کن.'
   },
 
   statue: {
-    name: 'Statue',
+    name: 'مجسمه',
     emoji: '🏛️',
     prompt:
-      'Make the person look like a classical marble statue, including the clothes and eyes.'
+      'شخص را شبیه به یک مجسمه مرمری کلاسیک کن، شامل لباس و چشم‌ها.'
   },
 
   banana: {
-    name: 'Banana',
+    name: 'موز',
     emoji: '🍌',
-    prompt: 'Make the person in the photo wear a banana costume.'
+    prompt: 'کاری کن شخص داخل عکس لباس موزی بپوشد.'
   },
 
   '80s': {
-    name: '80s',
+    name: 'دهه ۸۰',
     emoji: '✨',
     prompt:
-      'Make the person in the photo look like a 1980s yearbook photo. Feel free to change the hairstyle and clothing.'
+      'شخص داخل عکس را شبیه به عکس سالنامه دهه ۱۹۸۰ کن. می‌توانی مدل مو و لباس را تغییر دهی.'
   },
 
   '19century': {
-    name: '19th Cent.',
+    name: 'قرن ۱۹',
     emoji: '🎩',
     prompt:
-      'Make the photo look like a 19th century daguerreotype. Feel free to change the background to make it period appropriate and add props like Victorian clothing. Try to keep the perspective the same.'
+      'عکس را شبیه به یک داگرئوتایپ قرن نوزدهم کن. می‌توانی پس‌زمینه را برای تناسب با دوره تغییر دهی و وسایلی مانند لباس‌های ویکتوریایی اضافه کنی. سعی کن پرسپکتیو را حفظ کنی.'
   },
 
   anime: {
-    name: 'Anime',
+    name: 'انیمه',
     emoji: '🍣',
     prompt:
-      'Make the person in the photo look like a photorealistic anime character with exaggerated features.'
+      'شخص داخل عکس را شبیه به یک شخصیت انیمه فوتورئالیستی با ویژگی‌های اغراق‌آمیز کن.'
   },
 
   psychedelic: {
-    name: 'Psychedelic',
+    name: 'روانگردان',
     emoji: '🌈',
     prompt:
-      "Create a 1960s psychedelic hand-drawn poster-style illustration based on this image with bright bold solid colors and swirling shapes. Don't add any text."
+      "یک تصویرسازی به سبک پوستر روانگردان دهه ۱۹۶۰ با رنگ‌های تند و شاد و اشکال چرخشی بر اساس این تصویر ایجاد کن. هیچ متنی اضافه نکن."
   },
 
   '8bit': {
-    name: '8-bit',
+    name: '۸ بیتی',
     emoji: '🎮',
     prompt:
-      'Transform this image into a minimalist 8-bit brightly colored cute pixel art scene on a 80x80 pixel grid.'
+      'این تصویر را به یک صحنه پیکسل آرت ۸ بیتی مینیمالیستی، بامزه و با رنگ‌های روشن در یک گرید ۸۰x۸۰ پیکسلی تبدیل کن.'
   },
 
   beard: {
-    name: 'Big Beard',
+    name: 'ریش بزرگ',
     emoji: '🧔🏻',
-    prompt: 'Make the person in the photo look like they have a huge beard.'
+    prompt: 'کاری کن شخص داخل عکس ریش بسیار بزرگی داشته باشد.'
   },
 
   comic: {
-    name: 'Comic Book',
+    name: 'کتاب کمیک',
     emoji: '💥',
     prompt:
-      'Transform the photo into a comic book panel with bold outlines, halftone dots, and speech bubbles.'
+      'عکس را به یک پنل کتاب کمیک با خطوط ضخیم، نقطه‌های هافتون و حباب‌های گفتگو تبدیل کن.'
   },
 
   old: {
-    name: 'Old',
+    name: 'پیر',
     emoji: '👵🏻',
-    prompt: 'Make the person in the photo look extremely old.'
+    prompt: 'کاری کن شخص داخل عکس بسیار پیر به نظر برسد.'
   }
 }

@@ -1,6 +1,6 @@
 {
-  "name": "goolakh cam",
-  "description": "Try native image model effects with your webcam.",
+  "name": "goolakh",
+  "description": "افکت‌های تصویری را با وب‌کم خود امتحان کنید.",
   "requestFramePermissions": [
     "camera"
   ]
