@@ -33,17 +33,8 @@ export default function App() {
   const [hoveredMode, setHoveredMode] = useState(null)
   const [tooltipPosition, setTooltipPosition] = useState({top: 0, left: 0})
   const [showCustomPrompt, setShowCustomPrompt] = useState(false)
-  const [filterQuery, setFilterQuery] = useState('')
-  const [filterBy, setFilterBy] = useState('name')
-  const [isFiltering, setIsFiltering] = useState(false)
   const videoRef = useRef(null)
-
-  const filteredModes = Object.entries(modes).filter(([, mode]) => {
-    if (!filterQuery) return true
-    const query = filterQuery.toLowerCase().trim()
-    const target = mode[filterBy]?.toLowerCase()
-    return target?.includes(query)
-  })
+  const fileInputRef = useRef(null)
 
   const startVideo = async () => {
     setDidInitVideo(true)
@@ -88,6 +79,43 @@ export default function App() {
     setTimeout(() => setDidJustSnap(false), 1000)
   }
 
+  const handleFileUpload = event => {
+    const file = event.target.files[0]
+    if (!file) return
+
+    const reader = new FileReader()
+    reader.onload = e => {
+      const img = new Image()
+      img.onload = () => {
+        const {width, height} = img
+        const squareSize = Math.min(width, height)
+        canvas.width = squareSize
+        canvas.height = squareSize
+
+        const sourceX = (width - squareSize) / 2
+        const sourceY = (height - squareSize) / 2
+
+        ctx.clearRect(0, 0, squareSize, squareSize)
+        ctx.setTransform(1, 0, 0, 1, 0, 0)
+        ctx.drawImage(
+          img,
+          sourceX,
+          sourceY,
+          squareSize,
+          squareSize,
+          0,
+          0,
+          squareSize,
+          squareSize
+        )
+        snapPhoto(canvas.toDataURL('image/jpeg'))
+      }
+      img.src = e.target.result
+    }
+    reader.readAsDataURL(file)
+    event.target.value = null
+  }
+
   const downloadImage = () => {
     const a = document.createElement('a')
     a.href = gifUrl || imageData.outputs[focusedId]
@@ -115,6 +143,13 @@ export default function App() {
 
   return (
     <main>
+      <input
+        type="file"
+        ref={fileInputRef}
+        onChange={handleFileUpload}
+        style={{display: 'none'}}
+        accept="image/*"
+      />
       <div className="results">
         <h2>گالری</h2>
         <ul>
@@ -226,73 +261,39 @@ export default function App() {
 
         {videoActive && (
           <div className="videoControls">
-            {isFiltering ? (
-              <div className="filterControls">
-                <span className="icon">filter_alt</span>
-                <input
-                  type="text"
-                  aria-label="Filter modes"
-                  placeholder="فیلتر..."
-                  value={filterQuery}
-                  onChange={e => setFilterQuery(e.target.value)}
-                  autoFocus
-                />
-                <div className="filterOptions">
-                  <button
-                    className={c({active: filterBy === 'name'})}
-                    onClick={() => setFilterBy('name')}
-                  >
-                    نام
-                  </button>
-                  <button
-                    className={c({active: filterBy === 'emoji'})}
-                    onClick={() => setFilterBy('emoji')}
-                  >
-                    ایموجی
-                  </button>
-                  <button
-                    className={c({active: filterBy === 'prompt'})}
-                    onClick={() => setFilterBy('prompt')}
-                  >
-                    دستور
-                  </button>
-                </div>
-              </div>
-            ) : (
-              <ul className="modeSelector">
+            <ul className="modeSelector">
+              <li
+                key="custom"
+                onMouseEnter={e =>
+                  handleModeHover({key: 'custom', prompt: customPrompt}, e)
+                }
+                onMouseLeave={() => handleModeHover(null)}
+              >
+                <button
+                  className={c({active: activeMode === 'custom'})}
+                  onClick={() => {
+                    setMode('custom')
+                    setShowCustomPrompt(true)
+                  }}
+                >
+                  <p>سفارشی</p>
+                </button>
+              </li>
+              {Object.entries(modes).map(([key, {name, emoji, prompt}]) => (
                 <li
-                  key="custom"
-                  onMouseEnter={e =>
-                    handleModeHover({key: 'custom', prompt: customPrompt}, e)
-                  }
+                  key={key}
+                  onMouseEnter={e => handleModeHover({key, prompt}, e)}
                   onMouseLeave={() => handleModeHover(null)}
                 >
                   <button
-                    className={c({active: activeMode === 'custom'})}
-                    onClick={() => {
-                      setMode('custom')
-                      setShowCustomPrompt(true)
-                    }}
+                    onClick={() => setMode(key)}
+                    className={c({active: key === activeMode})}
                   >
-                    <p>سفارشی</p>
+                    <p>{name}</p>
                   </button>
                 </li>
-                {filteredModes.map(([key, {name, emoji, prompt}]) => (
-                  <li
-                    key={key}
-                    onMouseEnter={e => handleModeHover({key, prompt}, e)}
-                    onMouseLeave={() => handleModeHover(null)}
-                  >
-                    <button
-                      onClick={() => setMode(key)}
-                      className={c({active: key === activeMode})}
-                    >
-                      <p>{name}</p>
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            )}
+              ))}
+            </ul>
             <div className="mainControls">
               <button
                 className="galleryPreview"
@@ -305,9 +306,9 @@ export default function App() {
               <button onClick={takePhoto} className="shutter" />
               <button
                 className="cameraSwitch"
-                onClick={() => setIsFiltering(!isFiltering)}
+                onClick={() => fileInputRef.current.click()}
               >
-                <span className="icon">{isFiltering ? 'close' : 'search'}</span>
+                <span className="icon">add_photo_alternate</span>
               </button>
             </div>
           </div>
@@ -336,7 +337,7 @@ export default function App() {
         )}
       </div>
 
-      {hoveredMode && !isFiltering && (
+      {hoveredMode && (
         <div
           className={c('tooltip', {isFirst: hoveredMode.key === 'custom'})}
           role="tooltip"
