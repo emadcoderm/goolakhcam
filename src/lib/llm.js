@@ -32,8 +32,7 @@ export default limitFunction(
         const modelPromise = ai.models.generateContent({
           model,
           config: {responseModalities: [Modality.IMAGE]},
-          contents: {parts},
-          safetySettings
+          contents: {parts}
         })
 
         const response = await Promise.race([modelPromise, timeoutPromise])
@@ -69,10 +68,3 @@ export default limitFunction(
   },
   {concurrency: 2}
 )
-
-const safetySettings = [
-  'HARM_CATEGORY_HATE_SPEECH',
-  'HARM_CATEGORY_SEXUALLY_EXPLICIT',
-  'HARM_CATEGORY_DANGEROUS_CONTENT',
-  'HARM_CATEGORY_HARASSMENT'
-].map(category => ({category, threshold: 'BLOCK_NONE'}))
