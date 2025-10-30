@@ -2,7 +2,7 @@
  * @license
  * SPDX-License-Identifier: Apache-2.0
 */
-import {GIFEncoder, quantize, applyPalette} from 'https://unpkg.com/gifenc'
+import {GIFEncoder, quantize, applyPalette} from 'gifenc'
 import useStore from './store'
 import imageData from './imageData'
 import gen from './llm'
